@@ -23,6 +23,7 @@ let connectedUsers: {
   userId: string;
   userName: string;
   currentlyChatWith: string | undefined;
+  currentLocation:{latitude:number,longitude:number}|undefined
 }[] = [];
 
 /* io.use(async (socket,next)=>{
@@ -46,7 +47,7 @@ const allUsersResponse = () => {
   const modArr = connectedUsers
     .filter((user) => user.currentlyChatWith == undefined)
     .map((user) => {
-      return { userId: user.userId, userName: user.userName };
+      return { userId: user.userId, userName: user.userName,currentLocation:user.currentLocation };
     });
   //console.log(modArr);
   return modArr;
@@ -56,7 +57,8 @@ io.on("connection", (socket) => {
   const userId: string = socket.handshake.query.userId as string;
   const userName: string = socket.handshake.query.userName as string;
   console.log(`User connected with ID: ${userId}`);
-  connectedUsers.push({ socket, userId: userId, userName: userName, currentlyChatWith: undefined });
+  connectedUsers.push({ socket, userId: userId, userName: userName, currentlyChatWith: undefined,currentLocation:undefined });
+
 
   // Send the list of connected users to the newly connected user
   io.emit("connectedUsers", allUsersResponse());
@@ -113,6 +115,20 @@ io.on("connection", (socket) => {
     if (receiver) {
       receiver.socket.emit("receiveMessage", message);
     }
+  });
+
+  socket.on("setLocation", ({ userId, latitude, longitude }) => {
+    console.log(userId);
+    console.log(latitude, longitude);
+
+    connectedUsers = connectedUsers.map((user) => {
+      if (user.userId == userId) {
+        return { ...user, currentLocation:{latitude:latitude,longitude:longitude} };
+      }
+      return user;
+    });
+    console.log(connectedUsers);
+    io.emit("connectedUsers", allUsersResponse());
   });
 
   socket.on("disconnect", () => {
