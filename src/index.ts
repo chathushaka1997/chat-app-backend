@@ -2,8 +2,9 @@ import express from "express";
 import http from "http";
 import socket from "socket.io";
 import cors from "cors";
-import { protect } from "./middleware/protect";
+import { protect } from "../middleware/protect";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import router from "./routes/user.routes";
 
 const app = express();
 
@@ -166,6 +167,7 @@ io.on("connection", (socket) => {
     res.send("notification failed");
   }
 }); */
+app.use("/",router)
 
 app.get("/test", async (req, res) => {
   res.send("Hi I am test");
