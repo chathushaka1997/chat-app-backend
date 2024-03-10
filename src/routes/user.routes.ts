@@ -1,11 +1,9 @@
-import {Router} from "express";
+import { Router } from "express";
 import UserControllers from "../controllers/user.controllers";
 
 
-const router = Router()
 
+export function initUserRoutes(router: Router) {
+    router.get('/example', UserControllers.CreateUser)
+}
 
-//define routes
-router.get('/example',UserControllers.CreateUser)
-
-export default router
